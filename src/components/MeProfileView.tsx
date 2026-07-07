@@ -1,5 +1,6 @@
 import React from 'react';
-import { Award, ChevronRight, Bookmark, Settings, Edit3, HelpCircle, BarChart3 } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Award, Bookmark, Settings, BarChart3, ChevronRight, Star } from 'lucide-react';
 import { UserProfile, Achievement } from '../types';
 
 interface MeProfileViewProps {
@@ -9,225 +10,145 @@ interface MeProfileViewProps {
   onNavigateToSettings: () => void;
 }
 
-export default function MeProfileView({
-  profile,
-  achievements,
-  onNavigateToRecords,
-  onNavigateToSettings
-}: MeProfileViewProps) {
-  // Generate random heatmap intensity classes for 26 columns x 7 rows = 182 cells
-  const intensityClasses = [
-    'bg-secondary/10',
-    'bg-secondary/35',
-    'bg-secondary/60',
-    'bg-secondary'
-  ];
-
-  // Simulating 182 cells for the 26-week calendar heatmap
+export default function MeProfileView({ profile, achievements, onNavigateToRecords, onNavigateToSettings }: MeProfileViewProps) {
+  const intensityClasses = ['bg-secondary/10', 'bg-secondary/35', 'bg-secondary/60', 'bg-secondary'];
   const simulatedCells = Array.from({ length: 182 }).map((_, i) => {
-    // Produce some grouping pattern to make it look realistic
-    const seed = (Math.sin(i * 0.15) + Math.cos(i * 0.08) + 2) / 4; // 0.0 - 1.0
-    if (seed > 0.82) return 3;
-    if (seed > 0.58) return 2;
-    if (seed > 0.32) return 1;
-    return 0;
+    const seed = (Math.sin(i * 0.15) + Math.cos(i * 0.08) + 2) / 4;
+    if (seed > 0.82) return 3; if (seed > 0.58) return 2; if (seed > 0.32) return 1; return 0;
   });
 
+  const menuItems = [
+    { icon: <Bookmark className="w-5 h-5 text-primary" />, label: '我的收藏', badge: null, onClick: undefined },
+    { icon: <BarChart3 className="w-5 h-5 text-secondary" />, label: '我的战绩记录', badge: <span className="px-2 py-0.5 bg-error text-white text-[9px] font-display font-bold rounded-lg tracking-wider">NEW</span>, onClick: onNavigateToRecords },
+    { icon: <span className="material-symbols-outlined text-[20px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>edit_location_alt</span>, label: '场地报错与纠错', badge: null, onClick: undefined },
+    { icon: <Settings className="w-5 h-5 text-primary" />, label: '系统通用设置', badge: null, onClick: onNavigateToSettings },
+  ];
+
   return (
-    <div className="relative w-full h-full bg-surface text-on-surface font-body-lg flex flex-col pt-14 pb-20 overflow-y-auto no-scrollbar" id="me-profile-container">
-      {/* Settings header button */}
-      <div className="absolute top-14 right-4 z-10 flex gap-2">
-        <button
-          onClick={onNavigateToSettings}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur shadow-sm border border-outline/5 active:scale-95 transition-all text-primary"
-          title="打开设置"
-        >
+    <div className="relative w-full h-full bg-background flex flex-col overflow-y-auto no-scrollbar" id="me-profile-container">
+      {/* ── SETTINGS BUTTON ── */}
+      <div className="absolute top-0 right-4 z-10">
+        <button onClick={onNavigateToSettings}
+          className="w-10 h-10 flex items-center justify-center rounded-xl glass-surface shadow-card active-press transition-all text-on-surface">
           <Settings className="w-5 h-5" />
         </button>
       </div>
 
       <div className="p-4 space-y-4">
-        {/* PROFILE MAIN CARD */}
-        <section className="bg-white p-5 rounded-2xl shadow-soft border border-outline-variant/15 relative overflow-hidden text-left">
-          {/* Abstract background logo watermark */}
-          <div className="absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 opacity-[0.04] text-primary rotate-12 select-none pointer-events-none">
-            <span className="material-symbols-outlined text-[120px]">sports_tennis</span>
+
+        {/* ── PROFILE CARD ── */}
+        <section className="relative rounded-2xl p-5 overflow-hidden shadow-elevated text-white"
+          style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #E0552B 100%)' }}>
+          {/* Decorative */}
+          <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full bg-white/8" />
+          <div className="absolute bottom-0 right-0 w-24 h-24 opacity-[0.06] text-white rotate-12 select-none pointer-events-none">
+            <span className="material-symbols-outlined text-[100px]">sports_tennis</span>
           </div>
 
-          <div className="flex items-center gap-4 relative z-10">
-            {/* User Avatar */}
-            <div className="w-16 h-16 rounded-full border-2 border-primary-container p-0.5 shrink-0 relative bg-white shadow-soft">
-              <img
-                className="w-full h-full object-cover rounded-full"
-                src={profile.avatarUrl}
-                alt={profile.username}
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            
+          <div className="relative z-10 flex items-center gap-4">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="w-16 h-16 rounded-full ring-[3px] ring-white/40 p-0.5 flex-shrink-0 shadow-lg"
+            >
+              <img className="w-full h-full object-cover rounded-full" src={profile.avatarUrl} alt={profile.username} referrerPolicy="no-referrer" />
+            </motion.div>
             <div>
-              <h2 className="text-headline-md font-bold text-lg text-on-surface leading-tight font-sans">
-                {profile.username}
-              </h2>
-              <span className="inline-flex items-center px-2.5 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-[9px] font-extrabold tracking-wider font-mono mt-1.5 shadow-sm border border-amber-200">
-                <span className="material-symbols-outlined text-xs mr-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  workspace_premium
-                </span>
+              <h2 className="text-xl font-display font-bold leading-tight">{profile.username}</h2>
+              <span className="inline-flex items-center px-2.5 py-0.5 bg-white/15 backdrop-blur rounded-xl text-[10px] font-display font-bold tracking-wider mt-1.5">
+                <span className="material-symbols-outlined text-xs mr-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
                 {profile.levelBadge}
               </span>
             </div>
           </div>
 
-          {/* BENTO STATS METRICS */}
-          <div className="mt-6 grid grid-cols-3 gap-2 border-t border-surface-container-high pt-5">
-            <div className="text-center">
-              <div className="text-stats-number font-bold text-lg md:text-xl text-primary font-sans">
-                {profile.hoursPlayed}
-                <span className="text-[10px] font-medium text-on-surface-variant ml-0.5 font-mono">h</span>
-              </div>
-              <div className="text-[9px] font-bold text-on-surface-variant/70 tracking-wider uppercase font-mono mt-0.5">
-                打球总时
-              </div>
-            </div>
-
-            <div className="text-center border-x border-surface-container-high">
-              <div className="text-stats-number font-bold text-lg md:text-xl text-secondary font-sans">
-                {profile.winRate}
-                <span className="text-[10px] font-medium text-on-surface-variant ml-0.5 font-mono">%</span>
-              </div>
-              <div className="text-[9px] font-bold text-on-surface-variant/70 tracking-wider uppercase font-mono mt-0.5">
-                胜率
-              </div>
-            </div>
-
-            <div className="text-center">
-              <div className="text-stats-number font-bold text-lg md:text-xl text-tertiary font-sans">
-                {profile.points}
-              </div>
-              <div className="text-[9px] font-bold text-on-surface-variant/70 tracking-wider uppercase font-mono mt-0.5">
-                积分
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ACHIEVEMENTS CAROUSEL */}
-        <section className="space-y-2.5 text-left">
-          <div className="flex justify-between items-center px-1">
-            <h3 className="text-sm font-bold text-on-surface font-headline-md flex items-center gap-1">
-              <Award className="w-4 h-4 text-primary" />
-              <span>成就勋章</span>
-            </h3>
-            <span className="text-[10px] text-primary font-bold tracking-wider font-sans">
-              查看全部
-            </span>
-          </div>
-
-          <div className="flex gap-3.5 overflow-x-auto no-scrollbar py-1">
-            {achievements.map((ach) => (
-              <div
-                key={ach.id}
-                className={`flex-none w-20 flex flex-col items-center group transition-all duration-200 ${
-                  ach.unlocked ? '' : 'opacity-40 grayscale'
-                }`}
-              >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-1.5 shadow-sm active:scale-95 transition-transform ${ach.color}`}>
-                  <span className="material-symbols-outlined text-2xl font-bold select-none" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {ach.icon}
-                  </span>
+          {/* Stats */}
+          <div className="mt-5 grid grid-cols-3 gap-2 border-t border-white/15 pt-4">
+            {[
+              { value: profile.hoursPlayed, unit: 'h', label: '打球总时' },
+              { value: profile.winRate, unit: '%', label: '胜率' },
+              { value: profile.points, unit: '', label: '积分' },
+            ].map((s, i) => (
+              <div key={i} className={`text-center ${i === 1 ? 'border-x border-white/15' : ''}`}>
+                <div className="score-number text-lg font-bold">
+                  {s.value}<span className="text-[11px] font-medium text-white/70 ml-0.5">{s.unit}</span>
                 </div>
-                <span className="text-[9px] font-extrabold text-on-surface text-center truncate max-w-full font-sans">
-                  {ach.name}
-                </span>
+                <div className="text-[10px] font-semibold text-white/60 tracking-wider uppercase mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* GITHUB-STYLE 26-WEEK PLAY CALENDAR HEATMAP */}
-        <section className="bg-white p-4 rounded-2xl shadow-soft border border-outline-variant/15 text-left flex flex-col gap-3">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold text-on-surface flex items-center gap-1.5 font-headline-md">
+        {/* ── ACHIEVEMENTS ── */}
+        <section>
+          <div className="flex justify-between items-center px-1 mb-2.5">
+            <h3 className="text-sm font-display font-bold text-on-surface flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-primary" />
+              成就勋章
+            </h3>
+            <span className="text-xs text-primary font-bold">查看全部</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto no-scrollbar py-1">
+            {achievements.map((ach) => (
+              <motion.div
+                key={ach.id}
+                whileHover={{ scale: 1.05 }}
+                className={`flex-none w-[72px] flex flex-col items-center group transition-all duration-200 ${
+                  ach.unlocked ? '' : 'opacity-40 grayscale'
+                }`}
+              >
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-1.5 shadow-sm ${ach.color}`}>
+                  <span className="material-symbols-outlined text-2xl font-bold select-none" style={{ fontVariationSettings: "'FILL' 1" }}>{ach.icon}</span>
+                </div>
+                <span className="text-[9px] font-bold text-on-surface text-center leading-tight">{ach.name}</span>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── PLAY CALENDAR HEATMAP ── */}
+        <section className="bg-white p-4 rounded-2xl shadow-card border border-outline/5">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-sm font-display font-bold text-on-surface flex items-center gap-1.5">
               <span className="material-symbols-outlined text-primary text-lg select-none">sports_tennis</span>
               打球历程
             </h3>
-            <div className="text-[10px] text-on-surface-variant font-mono">过去26周活跃记录</div>
+            <span className="text-[10px] text-on-surface-muted font-medium">过去26周</span>
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            {/* Heatmap Grid container */}
-            <div className="grid grid-rows-7 grid-flow-col gap-[3px] overflow-x-auto no-scrollbar justify-center select-none pb-1">
+          <div className="flex justify-center">
+            <div className="grid grid-rows-7 grid-flow-col gap-[2.5px] select-none">
               {simulatedCells.map((intensityIdx, idx) => (
-                <div
-                  key={idx}
-                  className={`w-2.5 h-2.5 rounded-[2px] hover:scale-125 transition-transform ${intensityClasses[intensityIdx]}`}
-                  title={`打球历史活性: ${intensityIdx}`}
-                />
+                <div key={idx} className={`w-2.5 h-2.5 rounded-[2px] hover:scale-125 transition-transform ${intensityClasses[intensityIdx]}`}
+                  title={`活跃历史: ${intensityIdx}`} />
               ))}
             </div>
-
-            {/* Heatmap legend label rows */}
-            <div className="flex justify-end items-center gap-1 text-[9px] text-on-surface-variant font-sans px-1">
-              <span className="mr-1 opacity-70">Less</span>
-              {intensityClasses.map((cl, idx) => (
-                <div key={idx} className={`w-2.5 h-2.5 rounded-[1px] ${cl}`} />
-              ))}
-              <span className="ml-1 opacity-70">More</span>
-            </div>
+          </div>
+          <div className="flex justify-end items-center gap-1 text-[9px] text-on-surface-muted font-medium mt-3 px-1">
+            <span className="mr-1 opacity-60">Less</span>
+            {intensityClasses.map((cl, idx) => <div key={idx} className={`w-2.5 h-2.5 rounded-[1px] ${cl}`} />)}
+            <span className="ml-1 opacity-60">More</span>
           </div>
         </section>
 
-        {/* PROFILE NAVIGATION MENU OPTIONS */}
-        <section className="bg-white rounded-2xl shadow-soft border border-outline-variant/15 overflow-hidden text-xs">
-          <div className="divide-y divide-surface-container-high text-left">
-            {/* Collect */}
-            <div className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors duration-200 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <Bookmark className="w-4 h-4 text-primary" />
-                <span className="font-bold text-on-surface font-sans">我的收藏</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-on-surface-variant/40" />
-            </div>
-
-            {/* Match Records */}
-            <div 
-              onClick={onNavigateToRecords}
-              className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors duration-200 cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <BarChart3 className="w-4 h-4 text-secondary" />
-                <span className="font-bold text-on-surface font-sans">我的战绩记录</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="px-1.5 py-0.5 bg-red-500 text-white text-[8px] font-extrabold rounded-full font-sans tracking-wide">NEW</span>
-                <ChevronRight className="w-4 h-4 text-on-surface-variant/40" />
+        {/* ── MENU ── */}
+        <section className="bg-white rounded-2xl shadow-card border border-outline/5 overflow-hidden">
+          {menuItems.map((item, i) => (
+            <div key={i}>
+              {i > 0 && <div className="h-px bg-outline/10 mx-4" />}
+              <div onClick={item.onClick}
+                className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer active-press">
+                <div className="flex items-center gap-3">
+                  {item.icon}
+                  <span className="text-sm font-bold text-on-surface">{item.label}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {item.badge}
+                  <ChevronRight className="w-4 h-4 text-on-surface-muted/40" />
+                </div>
               </div>
             </div>
-
-            {/* Corrections */}
-            <div className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors duration-200 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  edit_location_alt
-                </span>
-                <span className="font-bold text-on-surface font-sans">场地报错与纠错</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-on-surface-variant/40" />
-            </div>
-
-            {/* Settings */}
-            <div 
-              onClick={onNavigateToSettings}
-              className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors duration-200 cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <Settings className="w-4 h-4 text-primary" />
-                <span className="font-bold text-on-surface font-sans">系统通用设置</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-on-surface-variant/40" />
-            </div>
-          </div>
+          ))}
         </section>
+
       </div>
     </div>
   );
