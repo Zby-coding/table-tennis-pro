@@ -1,0 +1,6 @@
+{
+  "name": "TableTennisPro",
+  "description": "TableTennisPro is a WeChat-style mini-program for table tennis matchmaking and court discovery. It supports location-based searches, player recruitment, check-ins, record tracking, and custom icon drag-and-drop uploads.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
